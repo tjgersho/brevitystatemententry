@@ -7,6 +7,7 @@ import loader from './loader.gif';
 import {GrClose, GrSave} from 'react-icons/gr';
 import { FaSpellCheck, FaChevronDown, FaChevronUp} from 'react-icons/fa';
 import {getCompletions, getGrammer} from '../apis/openai';
+import "./rotate.css"
 
 type BSEState = {
   loading: boolean;
@@ -161,11 +162,11 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
   render()   {
     return (
       <div id={this.props.id} style={{display: 'flex', flexGrow: 1, fontSize: 18}}>
-        <p style={{color: this.getStateColor()}}>
- 
+        {this.props.label ?
+        <p style={{color: this.getStateColor(), margin: 10}}>
             {this.props.label}
-     
         </p>
+        :null}
         <div style={{
               position: 'relative',
               display: 'flex',
@@ -205,12 +206,12 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
           />
 
           <div style={{display: 'flex', flexDirection: 'column', margin: 5, justifyContent: 'space-around'}}> 
-            <button style={{ border: 'none', background: 'transparent', padding: 0}} onClick={()=>{this.callLanguageModel();}} disabled={!this.props.apiBase}>
+            <button style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 0}} onClick={()=>{this.callLanguageModel();}} disabled={!this.props.apiBase}>
               <img src={aibnt} style={{width: 40, height: 40, opacity: this.props.apiBase? 1.0 : 0.25 }}/>
             </button>
 
 
-            <button style={{border: 'none', background: 'transparent', padding: 0, marginTop: 20}} onClick={()=>{this.callGrammerCheck();}} disabled={!this.props.apiBase}>
+            <button style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, marginTop: 20}} onClick={()=>{this.callGrammerCheck();}} disabled={!this.props.apiBase}>
               <FaSpellCheck style={{width: 40, height: 40}}/>
             </button>
           </div>
@@ -221,7 +222,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
           <div style={{display: 'flex', flexDirection: 'column'}}>
                 <div style={{justifyContent: 'center', display: Object.keys(this.state.suggestions).length > 0  || this.state.loading ? 'flex': 'none'}}>
                   <button 
-                    style={{border: 'none', padding: 10, background: '#fff',  borderRadius: 10, boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px", marginTop: -30 }}
+                    style={{border: 'none', cursor:'pointer', padding: 10, background: '#fff',  borderRadius: 10, boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px", marginTop: -30 }}
                     onClick={()=>{this.setState({showHideSuggestions: !this.state.showHideSuggestions})}} >
                       {this.state.loading ? 
                             <img src={loader} style={{width: 40, height: 40}}/>
@@ -252,9 +253,9 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                             </div>
 
                             <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}>
-                              <button style={{border: 'none', background: 'transparent', padding: 0, fontSize: 30}} onClick={()=>{this.removeSuggestion(s.id)}}><GrClose /></button>
+                              <button style={{border: 'none', cursor:'pointer', background: 'transparent', padding: 0, fontSize: 30}} onClick={()=>{this.removeSuggestion(s.id)}}><GrClose /></button>
 
-                              <button style={{border: 'none', background: 'transparent', padding: 0, fontSize: 30, marginTop: 30}} onClick={()=>{this.useSuggestion(s.id)}}><GrSave /></button>
+                              <button style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, fontSize: 30, marginTop: 30}} onClick={()=>{this.useSuggestion(s.id)}}><GrSave className="rotateimg180"/></button>
                             </div>
 
                         </div>

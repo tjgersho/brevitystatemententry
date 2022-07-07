@@ -5,6 +5,8 @@ import dts from "rollup-plugin-dts";
 import { terser } from "rollup-plugin-terser";
 import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 import image from '@rollup/plugin-image';
+import styles from "rollup-plugin-styles";
+
 const packageJson = require("./package.json");
 
 export default [
@@ -25,10 +27,11 @@ export default [
         plugins: [
             typescript({ tsconfig: "./tsconfig.json" }),
             image(),
+            styles(),
             peerDepsExternal(),
             resolve(),
             commonjs(),
-            terser()
+            terser(),
         ],
         external: ["react", "react-dom", "styled-components"]
     },
