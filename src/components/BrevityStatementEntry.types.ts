@@ -7,6 +7,16 @@ export enum AudienceType{
     Intellect,
 }
 
+export enum WordingOptimization {
+    Succinctness,
+    Compelling,
+    Clarity,
+    Grammar,
+    Aspiration
+}
+
+type onSaveType = (a: string) => void;
+
 export interface BSEProps {
     id?: string,
     label?: string,
@@ -16,7 +26,11 @@ export interface BSEProps {
     placeholder?:string,
     onChange?: ChangeEventHandler<HTMLTextAreaElement>,
     onBlur?: React.FocusEventHandler<HTMLTextAreaElement>,
+    onSave?: onSaveType,
     audience?: AudienceType,
     apiBase?: string,
-    textAreaStyles?: any
+    textAreaStyles?: any,
+    value?: string
+    textViewStyles: any,
+    optimizeBy?: WordingOptimization
 }

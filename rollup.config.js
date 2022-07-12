@@ -25,13 +25,16 @@ export default [
             },
         ],
         plugins: [
-            typescript({ tsconfig: "./tsconfig.json" }),
+            typescript({ 
+                tsconfig: "./tsconfig.json", 
+                exclude: ["./example_useage/**"]
+            }),
             image(),
             styles(),
             peerDepsExternal(),
             resolve(),
             commonjs(),
-            terser(),
+            terser()
         ],
         external: ["react", "react-dom", "styled-components"]
     },

@@ -5,7 +5,7 @@ import {BrevityStatementEntry, AudienceType, BSEProps} from 'brevitystatementent
 function App() {
   var props : BSEProps = {
     id: "someId",
-    apiBase: "http://localhost:8000",
+    apiBase: "httpS://intel.brevitypitch.com",
     audience: AudienceType.Bold,
     textAreaStyles: {background: "#eeefff"},
     label: "",
@@ -13,7 +13,8 @@ function App() {
     success: false,
     disabled: false,
     onChange: (e)=>{console.log("Change:", e.target.value)},
-    onBlur: (e)=>{console.log("Blur:", e.target.value)}
+    onBlur: (e)=>{console.log("Blur:", e.target.value)},
+    textViewStyles: {fontSize: 20}
   };
   return (
     <React.Fragment>
@@ -29,7 +30,7 @@ function App() {
     </div>
 
     <div style={{display: 'flex', justifyContent: 'center',  alignItems: 'center',  margin: 20}}>
-      <BrevityStatementEntry  {...{...props, ...{textAreaStyles:{borderWidth: 10, fontSize: 90}}}} />
+      <BrevityStatementEntry  {...{...props, ...{textAreaStyles:{borderWidth: 10, borderRadius: 19, height: 100, resize: 'none', overflow: 'auto', fontSize: 90}}}} />
     </div>
 
     <div style={{display: 'flex', justifyContent: 'center',  alignItems: 'center',  margin: 100}}>
