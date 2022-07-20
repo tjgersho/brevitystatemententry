@@ -30,7 +30,7 @@ function App() {
     </div>
 
     <div style={{display: 'flex', justifyContent: 'center',  alignItems: 'center',  margin: 20}}>
-      <BrevityStatementEntry  {...{...props, ...{textAreaStyles:{borderWidth: 10, borderRadius: 19, height: 100, resize: 'none', overflow: 'auto', fontSize: 90}}}} />
+      <BrevityStatementEntry  {...{...props, active: true, doGrammer: false, ...{textAreaStyles:{borderWidth: 10, borderRadius: 19, height: 100, resize: 'none', overflow: 'auto', fontSize: 90}}}} />
     </div>
 
     <div style={{display: 'flex', justifyContent: 'center',  alignItems: 'center',  margin: 100}}>

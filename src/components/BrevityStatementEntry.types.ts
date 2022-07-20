@@ -20,8 +20,6 @@ type onSaveType = (a: string) => void;
 export interface BSEProps {
     id?: string,
     label?: string,
-    error?:boolean,
-    success?:boolean,
     disabled?: boolean,
     placeholder?:string,
     onChange?: ChangeEventHandler<HTMLTextAreaElement>,
@@ -30,7 +28,11 @@ export interface BSEProps {
     audience?: AudienceType,
     apiBase?: string,
     textAreaStyles?: any,
-    value?: string
     textViewStyles: any,
-    optimizeBy?: WordingOptimization
+    value?: string,
+    optimizeBy?: WordingOptimization,
+    active?: boolean,
+    showSave?: boolean,
+    doSuggestionList?: boolean,
+    editMode?: boolean
 }

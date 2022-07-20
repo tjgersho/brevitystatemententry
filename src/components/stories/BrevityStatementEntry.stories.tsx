@@ -17,11 +17,7 @@ const Template: Story<BSEProps>  = (args)=>{
 
  
 export const Primary = Template.bind({});
-Primary.args = {
-  error: false,
-  disabled: false,
-  label: 'Primary',
-};
+Primary.args = {};
 
 export const Success = Template.bind({});
 Success.args = {

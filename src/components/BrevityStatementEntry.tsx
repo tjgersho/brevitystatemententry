@@ -5,7 +5,7 @@ import aibnt from "./aibtn.png";
 import loader from './loader.gif';
 
 import {GrClose, GrSave} from 'react-icons/gr';
-import { FaSpellCheck, FaChevronDown, FaChevronUp, FaPencilAlt, FaSave} from 'react-icons/fa';
+import { FaSpellCheck, FaChevronDown, FaChevronUp, FaPencilAlt, FaSave, FaChevronLeft, FaChevronRight} from 'react-icons/fa';
 import {getCompletions, getGrammer} from '../apis/openai';
 import "./rotate.css"
 
@@ -18,7 +18,10 @@ type BSEState = {
   textAreaHeight: number;
   textAreaSizeChanging: boolean;
   showHideSuggestions: boolean;
-  mode: string;
+  editMode: boolean;
+  history: string[],
+  historyPointer: number,
+  scrollLeft: boolean
 }
 
 
@@ -40,7 +43,10 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
      statementEntry: "",
      textAreaSizeChanging: false,
      showHideSuggestions: true,
-     mode: "ENTRY",
+     editMode: false,
+     history: [],
+     historyPointer: -1,
+     scrollLeft: true
    };
 
 
@@ -48,7 +54,12 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
       label: "Enter a single pitch statement.",
       placeholder: "Write your statement here.",
       apiBase: "http://localhost:8000",
-      activateAI: false
+      activateAI: false,
+      doGrammer: false,
+      active: true,
+      showSave: false,
+      doSuggestionList: false,
+      editMode: false
    };
 
    private textRef: React.RefObject<HTMLTextAreaElement> = React.createRef<HTMLTextAreaElement>();
@@ -61,6 +72,9 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
     if(this.props.value){
       this.setState({statementEntry: this.props.value});
     }
+    if(this.props.editMode){
+      this.setState({editMode: true});
+    }
   
    }
 
@@ -70,32 +84,66 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
         this.setState({statementEntry: this.props.value});
       }
     }
- 
    }
  
+
+   public componentWillReceiveProps(nextProps: BSEProps){
+    if(nextProps.editMode != undefined){
+      if(nextProps.editMode != this.props.editMode){
+        this.setState({editMode: nextProps.editMode});
+      }
+    }
+   }
+
   private onStatementChange(e: React.ChangeEvent<HTMLTextAreaElement>): void {
     this.setState({statementEntry: e.target.value});
   }
   
+  private getRandomSuccinctSynonym(){
+    var synonymList = ["succinct", "blunt", "terse", "compact", "short"];
+    const randomIndex = Math.floor(Math.random() * synonymList.length);
+    return synonymList[randomIndex];
+  }
+
+  private getRandomClaritytSynonym(){
+    var synonymList = ["accurate", "certain", "positive", "trustworthy", "clear"];
+    const randomIndex = Math.floor(Math.random() * synonymList.length);
+    return synonymList[randomIndex];
+  }
+
+  private getRandomAspirationSynonym(){
+    var synonymList = ["dreamy", "aspirational", "eager", "longing", "passionate"];
+    const randomIndex = Math.floor(Math.random() * synonymList.length);
+    return synonymList[randomIndex];
+  }
+
+  private getRandomCompellingSynonym(){
+    var synonymList = ["facinating", "coersive", "compulsory", "forcible", "compelling"];
+    const randomIndex = Math.floor(Math.random() * synonymList.length);
+    return synonymList[randomIndex];
+  }
+ 
+ 
+
   private generatePrompt() : string{
       var prepend = "";
 
       if(this.props.optimizeBy != undefined){
         switch(this.props.optimizeBy){
           case WordingOptimization.Succinctness:
-            prepend = "Write a persuasive statement that is extreamly succinct similar to: ";
+            prepend = "Write a persuasive statement that is extreamly " +this.getRandomSuccinctSynonym()+ " similar to: ";
             break;
           case WordingOptimization.Clarity:
-            prepend = "Write a clear statement similar to: ";
+            prepend = "Write a " +this.getRandomClaritytSynonym()+ " statement similar to: ";
             break;
           case WordingOptimization.Aspiration:
-            prepend = "Write a very aspirational statement from the basis: ";
+            prepend = "Write a very " +this.getRandomAspirationSynonym()+ " statement from the basis: ";
             break;
           case WordingOptimization.Grammar:
             prepend = "Correct this statement for grammer: ";
             break;
           case WordingOptimization.Compelling:
-            prepend = "Write a profound and compelling statement similar to: ";
+            prepend = "Write a " +this.getRandomCompellingSynonym()+ " statement similar to: ";
             break;
           default:
             prepend = "Write a persuasive pitch similar to: ";
@@ -132,13 +180,15 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
       var response = await getCompletions(this.props.apiBase, this.generatePrompt());
       var addsuggestions = {...this.state.suggestions};
       var nextSort = this.state.sort;
+      console.log(response);
       if(response !== "FAILED CALL"){
         //get all responses.
         console.log("REspons...");
         console.log(response);
  
        
-        var text = response.suggestion;
+        var text = response.suggestion.trim();
+
         var arrayOfText = text.split(".");
         const reversed = arrayOfText.reverse();
         for(var s of reversed){
@@ -149,7 +199,25 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
           }
         }
 
-        this.setState({suggestions:  addsuggestions, loading: false, sort: nextSort});
+        var newHistory = [...this.state.history];
+
+        if(newHistory.length == 0){
+          newHistory.push(this.state.statementEntry);
+        }
+        
+        newHistory.push(text);
+        console.log("NEw History???");
+        console.log(newHistory);
+
+        this.setState({
+          suggestions:  addsuggestions, 
+          loading: false, 
+          sort: nextSort, 
+          statementEntry: text, 
+          history: newHistory, 
+          historyPointer: newHistory.length-1,
+          scrollLeft: true
+        });
         
       }else{
         var newId = "BSt-" + new Date().getTime() + "-ID";
@@ -159,39 +227,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
     }
   }
 
-  private async callGrammerCheck(): Promise<void>{
-    if(this.props.apiBase){
-      this.setState({loading: true, showHideSuggestions: true});
-      var response = await getGrammer(this.props.apiBase, this.state.statementEntry);
-
-      var addsuggestions = {...this.state.suggestions};
-        
-      var nextSort = this.state.sort;
-      if(response !== "FAILED CALL"){
-        //get all responses.
-        console.log("REspons...");
-        console.log(response);
-      
-        var text = response.suggestion.trim();
-        
-        if(text != ""){
-          var newId = "BSt-" + new Date().getTime() + "-ID";
-          addsuggestions[newId] = {id: newId, statement: text, sort: nextSort};
-          nextSort++;
-        }
-  
-        this.setState({suggestions:  addsuggestions, loading: false, sort: nextSort});
-
-
-      }else{
-        var newId = "BSt-" + new Date().getTime() + "-ID";
-        addsuggestions[newId] = {id: newId, statement: "Sorry, could not reach the cloud to talk with the AI, check your internet connection and try again later.", sort: nextSort};
-        this.setState({suggestions:  addsuggestions, loading: false, sort: nextSort});
-      }
-
-    }
-  }
-
+ 
   private removeSuggestion(s: string){
     var oldsuggestions = {...this.state.suggestions};
     delete oldsuggestions[s];
@@ -230,21 +266,63 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
        this.setState({statementEntry: useSuggestion.statement});
       }
   }
- 
 
+  private scrollThruStatements(){
+    if(this.state.scrollLeft){
+      var newHistoryPointer = this.state.historyPointer-1;
 
+      console.log(newHistoryPointer      );
+      console.log(this.state.history);
+      if(newHistoryPointer>0){
+        this.setState({statementEntry: this.state.history[newHistoryPointer], historyPointer: newHistoryPointer});
+      } else{
+        this.setState({statementEntry: this.state.history[0], historyPointer: 0, scrollLeft: false});
+      }
+    }else{
+      var newHistoryPointer = this.state.historyPointer+1;
+      console.log(newHistoryPointer      );
+      console.log(this.state.history);
+      if(newHistoryPointer < this.state.history.length){
+        this.setState({statementEntry: this.state.history[newHistoryPointer], historyPointer: newHistoryPointer});
+      }else{
+        this.setState({statementEntry: this.state.history[this.state.history.length-1], historyPointer: this.state.history.length-1, scrollLeft: true});
+      }
+    }
+  }
+  
   private getStateColor() : string{
       return (
-          this.props.error ? 'red' :
-          this.props.success ? 'green' : 
           this.props.disabled ? 'rgba(0,0,0,0.3)':'black'
       );
   };
 
+  getOptimizeByColor(isText: boolean){
+
+    if(this.props.optimizeBy == undefined){
+      if(isText){
+        return "#333";
+      }
+      return 'transparent';
+    }
+    
+    switch(this.props.optimizeBy){
+      case WordingOptimization.Succinctness:
+        return '#e168ff';
+      case WordingOptimization.Aspiration:
+        return '#ef6868';
+      case WordingOptimization.Clarity:
+        return '#7e73ef';
+      case WordingOptimization.Compelling:
+        return '#a5b3d2';
+      case WordingOptimization.Grammar:
+        return '#f2d2a3';
+    }
+ 
+  }
 
   render()   {
 
-    if(this.state.mode === "ENTRY"){
+    if(this.state.editMode){
         return (
           <div id={this.props.id} style={{display: 'flex', flexGrow: 1, fontSize: 18}}>
             {this.props.label ?
@@ -276,11 +354,11 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                     flexGrow: 1,
                     fontSize: '1.2em',
                     borderRadius: 5, 
-                    borderWidth: 2,
+                    borderWidth: 0,
                     borderColor: this.getStateColor(),
-                    color: this.getStateColor(),
                     padding: 10,
                     backgroundColor: '#edf2f9',
+                    color: this.getOptimizeByColor(true),
                     ...{...this.props.textAreaStyles}
                     }}
                   value={this.state.statementEntry}
@@ -291,33 +369,48 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
               />
 
               <div style={{display: 'flex', flexDirection: 'column', margin: 5, justifyContent: 'space-around'}}> 
-                <button style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 0}} onClick={()=>{this.callLanguageModel();}} disabled={!this.props.apiBase}>
-                  <img src={aibnt} style={{width: 30, height: 30, opacity: this.props.apiBase? 1.0 : 0.25 }}/>
-                </button>
+             
+                {this.props.active ?
+                  <button style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 5,  borderRadius: 10,  boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",}} onClick={()=>{this.callLanguageModel();}} disabled={!this.props.apiBase}>
+                    <img src={aibnt} style={{width: 30, height: 30, opacity: this.props.apiBase? 1.0 : 0.25 }}/>
+                  </button>
+                : null}
+       
+                {this.props.showSave? 
+                  <button 
+                    style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0}} 
+                    onClick={
+                      ()=>{
+                        if(this.props.onSave){
+                          this.props.onSave(this.state.statementEntry); 
+                        }
+                        console.log("SAVE>>");
+                        this.setState({editMode: false})
+                      }} 
+                    disabled={!this.props.apiBase}>
+                    <FaSave style={{width: 30, height: 30}}/>
+                  </button>
+                : null}
 
+                 {(this.state.history.length > 0 || this.state.loading) && !this.props.doSuggestionList ?
+                  <button 
+                      style={{border: 'none', cursor:'pointer', background: '#fff',  borderRadius: 10, display: 'flex', alignItems: 'center', height: 35, boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
+                      onClick={()=>{this.scrollThruStatements()}} >
+                        {this.state.loading ? 
+                              <img src={loader} style={{width: 30, height: 30}}/>
+                        : <React.Fragment>
+                              {this.state.scrollLeft ? <FaChevronLeft style={{width: 30, height: 30}}/> :  <FaChevronRight style={{width: 30, height: 30}}/>}
+                        </React.Fragment>
+                        }
+                  </button>
+                :null}
 
-                <button style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, marginTop: 20}} onClick={()=>{this.callGrammerCheck();}} disabled={!this.props.apiBase}>
-                  <FaSpellCheck style={{width: 30, height: 30}}/>
-                </button>
-
-                
-                <button 
-                style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, marginTop: 20}} 
-                onClick={
-                  ()=>{
-                    if(this.props.onSave){
-                      this.props.onSave(this.state.statementEntry); 
-                    }
-                    this.setState({mode: 'REVIEW'});
-                  }} 
-                disabled={!this.props.apiBase}>
-                  <FaSave style={{width: 30, height: 30}}/>
-                </button>
               </div>
 
             </div>
 
-
+           
+              {this.props.doSuggestionList ?
               <div style={{display: 'flex', flexDirection: 'column'}}>
                     <div style={{justifyContent: 'center', display: Object.keys(this.state.suggestions).length > 0  || this.state.loading ? 'flex': 'none'}}>
                       <button 
@@ -365,7 +458,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
 
                   : null}
             </div>
-      
+            :null}
                   
             </div>
 
@@ -373,17 +466,21 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
           </div>
         );
     }
-   if(this.state.mode === "REVIEW"){
+
+   if(!this.state.editMode){
       return (
         <div style={{display: 'flex', justifyContent: 'space-between', }}> 
       
-            <div style={{flexGrow: 1, ...this.props.textViewStyles}}>{this.state.statementEntry ? this.state.statementEntry: null} </div>
+            <div style={{flexGrow: 1, color: this.props.active ? this.getOptimizeByColor() : "#333", ...this.props.textViewStyles}}>{this.state.statementEntry ? this.state.statementEntry: null} </div>
             
-  
-            <button style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 0}} onClick={()=>{this.setState({mode: 'ENTRY'});}} disabled={!this.props.apiBase}>
-                <FaPencilAlt style={{width: 30, height: 30}}/>
-            </button>
-
+            {this.props.active ?
+              <button
+               style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, margin: 5}}
+                onClick={()=>{this.setState({editMode: true});}}
+                 disabled={!this.props.apiBase}>
+                  <FaPencilAlt style={{width: 30, height: 30}}/>
+              </button>
+            : null}
         </div>
       );
     }
