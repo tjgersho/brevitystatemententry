@@ -34,5 +34,7 @@ export interface BSEProps {
     active?: boolean,
     showSave?: boolean,
     doSuggestionList?: boolean,
-    editMode?: boolean
+    editMode?: boolean,
+    doArrowBtns?: boolean,
+    btnStyles?: any
 }

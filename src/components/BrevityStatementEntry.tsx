@@ -1,8 +1,10 @@
 import React from "react";
 import { AudienceType, WordingOptimization, BSEProps  } from "./BrevityStatementEntry.types";
 
-import aibnt from "./aibtn.png";
+import AiBnt from "./AiBtn";
 import loader from './loader.gif';
+import BackBtn from './BackBtn';
+
 
 import {GrClose, GrSave} from 'react-icons/gr';
 import { FaSpellCheck, FaChevronDown, FaChevronUp, FaPencilAlt, FaSave, FaChevronLeft, FaChevronRight} from 'react-icons/fa';
@@ -53,14 +55,30 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
    static defaultProps = {
       label: "Enter a single pitch statement.",
       placeholder: "Write your statement here.",
-      apiBase: "http://localhost:8000",
+      apiBase: "https://intel.brevitypitch.com",
       activateAI: false,
       doGrammer: false,
       active: true,
       showSave: false,
       doSuggestionList: false,
-      editMode: false
+      editMode: false,
+      doArrowBtns: false,
+      btnStyles: {
+        color: "green",
+        boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" 
+      }
    };
+
+   private btnStyleDefault: any =  {
+      border: 'none', 
+      cursor:'pointer',
+      background: '#fff', 
+      borderRadius: 10, 
+      display: 'flex', 
+      alignItems: 'center', 
+      justifyContent: 'center',
+      padding: 5
+    };
 
    private textRef: React.RefObject<HTMLTextAreaElement> = React.createRef<HTMLTextAreaElement>();
  
@@ -100,25 +118,25 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
   }
   
   private getRandomSuccinctSynonym(){
-    var synonymList = ["succinct", "blunt", "terse", "compact", "short"];
+    var synonymList = ["succinct", "blunt", "precise", "direct", "simple", "straightforward", "breif", "terse", "compact", "short"];
     const randomIndex = Math.floor(Math.random() * synonymList.length);
     return synonymList[randomIndex];
   }
 
   private getRandomClaritytSynonym(){
-    var synonymList = ["accurate", "certain", "positive", "trustworthy", "clear"];
+    var synonymList = ["accurate", "comprehensive", "intelligent", "explicit", "certain", "positive", "trustworthy", "clear"];
     const randomIndex = Math.floor(Math.random() * synonymList.length);
     return synonymList[randomIndex];
   }
 
   private getRandomAspirationSynonym(){
-    var synonymList = ["dreamy", "aspirational", "eager", "longing", "passionate"];
+    var synonymList = ["dreamy", "aspirational", "ambition", "spirited", "motivational", "inspirational", "eager", "longing", "passionate"];
     const randomIndex = Math.floor(Math.random() * synonymList.length);
     return synonymList[randomIndex];
   }
 
   private getRandomCompellingSynonym(){
-    var synonymList = ["facinating", "coersive", "compulsory", "forcible", "compelling"];
+    var synonymList = ["facinating","cogent", "convicing", "persuasive", "alluring", "inspiring", "coersive", "compulsory", "forcible", "compelling"];
     const randomIndex = Math.floor(Math.random() * synonymList.length);
     return synonymList[randomIndex];
   }
@@ -368,17 +386,19 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                   
               />
 
-              <div style={{display: 'flex', flexDirection: 'column', margin: 5, justifyContent: 'space-around'}}> 
+              <div style={{display: 'flex', flexDirection: 'column', alignItems:'center', margin: 5, justifyContent: 'space-around'}}> 
              
                 {this.props.active ?
-                  <button style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 5,  borderRadius: 10,  boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px",}} onClick={()=>{this.callLanguageModel();}} disabled={!this.props.apiBase}>
-                    <img src={aibnt} style={{width: 30, height: 30, opacity: this.props.apiBase? 1.0 : 0.25 }}/>
+                  <button  style={{...this.btnStyleDefault, ...this.props.btnStyles}} onClick={()=>{this.callLanguageModel();}}  disabled={this.props.disabled}>
+                      <div style={{width: 50}}>
+                        <AiBnt {...{color: this.props.btnStyles.color || "#333"}}  />
+                      </div>
                   </button>
                 : null}
        
                 {this.props.showSave? 
                   <button 
-                    style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0}} 
+                    style={{...this.btnStyleDefault, ...this.props.btnStyles}}
                     onClick={
                       ()=>{
                         if(this.props.onSave){
@@ -387,19 +407,28 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                         console.log("SAVE>>");
                         this.setState({editMode: false})
                       }} 
-                    disabled={!this.props.apiBase}>
-                    <FaSave style={{width: 30, height: 30}}/>
+                      disabled={this.props.disabled}
+                      >
+                    <FaSave style={{width: 25, height: 25}}/>
                   </button>
                 : null}
 
                  {(this.state.history.length > 0 || this.state.loading) && !this.props.doSuggestionList ?
                   <button 
-                      style={{border: 'none', cursor:'pointer', background: '#fff',  borderRadius: 10, display: 'flex', alignItems: 'center', height: 35, boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px" }}
-                      onClick={()=>{this.scrollThruStatements()}} >
+                      style={{...this.btnStyleDefault, ...this.props.btnStyles}}
+                      onClick={()=>{this.scrollThruStatements()}} 
+                      disabled={this.props.disabled}
+                      >
                         {this.state.loading ? 
                               <img src={loader} style={{width: 30, height: 30}}/>
                         : <React.Fragment>
-                              {this.state.scrollLeft ? <FaChevronLeft style={{width: 30, height: 30}}/> :  <FaChevronRight style={{width: 30, height: 30}}/>}
+                          {this.props.doArrowBtns? 
+                              <React.Fragment>
+                                {this.state.scrollLeft ? <FaChevronLeft style={{width: 30, height: 30}}/> :  <FaChevronRight style={{width: 30, height: 30}}/>}
+                              </React.Fragment>
+                              :
+                              <BackBtn {...{color: this.props.btnStyles.color || "#333"}} />
+                          }
                         </React.Fragment>
                         }
                   </button>
@@ -415,7 +444,9 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                     <div style={{justifyContent: 'center', display: Object.keys(this.state.suggestions).length > 0  || this.state.loading ? 'flex': 'none'}}>
                       <button 
                         style={{border: 'none', cursor:'pointer', background: '#fff',  borderRadius: 10, display: 'flex', alignItems: 'center', height: 35, boxShadow: "rgba(0, 0, 0, 0.24) 0px 3px 8px", marginTop: -20 }}
-                        onClick={()=>{this.setState({showHideSuggestions: !this.state.showHideSuggestions})}} >
+                        onClick={()=>{this.setState({showHideSuggestions: !this.state.showHideSuggestions})}} 
+                        disabled={this.props.disabled}
+                        >
                           {this.state.loading ? 
                                 <img src={loader} style={{width: 30, height: 30}}/>
                           : <React.Fragment>
@@ -445,9 +476,9 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                                 </div>
 
                                 <div style={{display: 'flex', flexDirection: 'column', justifyContent: 'space-around'}}>
-                                  <button style={{border: 'none', cursor:'pointer', background: 'transparent', padding: 0, fontSize: 30}} onClick={()=>{this.removeSuggestion(s.id)}}><GrClose /></button>
+                                  <button style={{border: 'none', cursor:'pointer', background: 'transparent', padding: 0, fontSize: 30}} onClick={()=>{this.removeSuggestion(s.id)}}  disabled={this.props.disabled}><GrClose /></button>
 
-                                  <button style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, fontSize: 30, marginTop: 30}} onClick={()=>{this.useSuggestion(s.id)}}><GrSave className="rotateimg180"/></button>
+                                  <button style={{border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, fontSize: 30, marginTop: 30}} onClick={()=>{this.useSuggestion(s.id)}}  disabled={this.props.disabled}><GrSave className="rotateimg180"/></button>
                                 </div>
 
                             </div>
@@ -471,14 +502,14 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
       return (
         <div style={{display: 'flex', justifyContent: 'space-between', }}> 
       
-            <div style={{flexGrow: 1, color: this.props.active ? this.getOptimizeByColor() : "#333", ...this.props.textViewStyles}}>{this.state.statementEntry ? this.state.statementEntry: null} </div>
+            <div style={{flexGrow: 1, color: this.props.active ? this.getOptimizeByColor(true) : "#333", ...this.props.textViewStyles}}>{this.state.statementEntry ? this.state.statementEntry: null} </div>
             
             {this.props.active ?
               <button
-               style={{ border: 'none', cursor:'pointer',  background: 'transparent', padding: 0, margin: 5}}
+                style={{...this.btnStyleDefault, ...this.props.btnStyles}}
                 onClick={()=>{this.setState({editMode: true});}}
-                 disabled={!this.props.apiBase}>
-                  <FaPencilAlt style={{width: 30, height: 30}}/>
+                disabled={this.props.disabled}>
+                  <FaPencilAlt style={{ margin: 10, width: 25, height: 25  }}/>
               </button>
             : null}
         </div>
