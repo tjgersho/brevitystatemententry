@@ -5,12 +5,12 @@ import {BrevityStatementEntry, AudienceType, BSEProps} from 'brevitystatementent
 function App() {
   var props : BSEProps = {
     id: "someId",
-    apiBase: "httpS://intel.brevitypitch.com",
+    apiBase: "https://intel.brevitypitch.com",
     audience: AudienceType.Bold,
     textAreaStyles: {background: "#eeefff"},
     label: "",
-    error: false,
-    success: false,
+    active: true,
+    showSave: true,
     disabled: false,
     onChange: (e)=>{console.log("Change:", e.target.value)},
     onBlur: (e)=>{console.log("Blur:", e.target.value)},
@@ -20,14 +20,16 @@ function App() {
     <React.Fragment>
     <div style={{width: 1000, marginLeft: 20}}>
       <BrevityStatementEntry  {...props} />
-    </div>
+    </div> 
 
 
-    <div style={{display: 'flex', justifyContent: 'center',  alignItems: 'center',  marginLeft: 20, marginRight: 20}}>
+    <div style={{display: 'flex', width: 500, justifyContent: 'center',  alignItems: 'center',  marginLeft: 20, marginRight: 20 }}>
       <div style={{width: "80%"}}>
        <BrevityStatementEntry  {...props} />
       </div>
+ 
     </div>
+ 
 
     <div style={{display: 'flex', justifyContent: 'center',  alignItems: 'center',  margin: 20}}>
       <BrevityStatementEntry  {...{...props, active: true, doGrammer: false, ...{textAreaStyles:{borderWidth: 10, borderRadius: 19, height: 100, resize: 'none', overflow: 'auto', fontSize: 90}}}} />

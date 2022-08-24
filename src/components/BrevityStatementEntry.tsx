@@ -81,22 +81,27 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
     };
 
    private textRef: React.RefObject<HTMLTextAreaElement> = React.createRef<HTMLTextAreaElement>();
- 
 
-   public componentDidMount(){
-    if(this.textRef.current){
-      this.textRef.current.style.height = "100px";
+    public componentDidMount(){
+        if(this.props.reference){
+            this.textRef = this.props.reference;
+        } else if(this.textRef.current){
+            this.textRef.current.style.height = "100px";
+        }
+        if(this.props.value){
+            this.setState({statementEntry: this.props.value});
+        }
+        if(this.props.editMode){
+            this.setState({editMode: true});
+        }
+
     }
-    if(this.props.value){
-      this.setState({statementEntry: this.props.value});
-    }
-    if(this.props.editMode){
-      this.setState({editMode: true});
-    }
-  
-   }
 
    public componentDidUpdate(){
+    if(this.props.reference && this.textRef.current){
+      this.textRef.current.style.height = this.textRef.current.scrollHeight + "px";
+      this.textRef.current.focus();
+    }
     if(this.props.value){
       if(this.props.value != this.state.statementEntry){
         this.setState({statementEntry: this.props.value});
@@ -115,6 +120,9 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
 
   private onStatementChange(e: React.ChangeEvent<HTMLTextAreaElement>): void {
     this.setState({statementEntry: e.target.value});
+    if(this.textRef.current){
+      this.textRef.current.style.height = this.textRef.current.scrollHeight + "px";
+    }
   }
   
   private getRandomSuccinctSynonym(){
@@ -236,6 +244,10 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
           historyPointer: newHistory.length-1,
           scrollLeft: true
         });
+
+        if(this.props.setTextAreaInput){
+          this.props.setTextAreaInput(text);
+        };
         
       }else{
         var newId = "BSt-" + new Date().getTime() + "-ID";
@@ -294,7 +306,8 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
       if(newHistoryPointer>0){
         this.setState({statementEntry: this.state.history[newHistoryPointer], historyPointer: newHistoryPointer});
       } else{
-        this.setState({statementEntry: this.state.history[0], historyPointer: 0, scrollLeft: false});
+        newHistoryPointer = 0
+        this.setState({statementEntry: this.state.history[newHistoryPointer], historyPointer: newHistoryPointer, scrollLeft: false});
       }
     }else{
       var newHistoryPointer = this.state.historyPointer+1;
@@ -303,9 +316,13 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
       if(newHistoryPointer < this.state.history.length){
         this.setState({statementEntry: this.state.history[newHistoryPointer], historyPointer: newHistoryPointer});
       }else{
-        this.setState({statementEntry: this.state.history[this.state.history.length-1], historyPointer: this.state.history.length-1, scrollLeft: true});
+        newHistoryPointer = this.state.history.length-1;
+        this.setState({statementEntry: this.state.history[newHistoryPointer], historyPointer: newHistoryPointer, scrollLeft: true});
       }
     }
+    if(this.props.setTextAreaInput){
+      this.props.setTextAreaInput(this.state.history[newHistoryPointer]);
+    };
   }
   
   private getStateColor() : string{
@@ -366,6 +383,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                 ref={this.textRef}
                 onChange={(e)=>{this.onStatementChange(e); if(this.props.onChange){ this.props.onChange(e);}}}
                 onBlur={(e)=>{if(this.props.onBlur){ this.props.onBlur(e);}}}
+                onFocus={(e) => {e.currentTarget.setSelectionRange(e.currentTarget.value.length, e.currentTarget.value.length);}}
                 disabled={this.props.disabled}
                 name={"statementEntry"}
                 style={{
@@ -398,7 +416,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
        
                 {this.props.showSave? 
                   <button 
-                    style={{...this.btnStyleDefault, ...this.props.btnStyles}}
+                    style={{...this.btnStyleDefault, ...this.props.btnStyles, marginTop:5, marginBottom: 5}}
                     onClick={
                       ()=>{
                         if(this.props.onSave){
@@ -409,7 +427,9 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                       }} 
                       disabled={this.props.disabled}
                       >
-                    <FaSave style={{width: 25, height: 25}}/>
+                        <div style={{width: 50, height:50, display: 'flex', alignItems: 'center',justifyContent: 'center'}}> 
+                          <FaSave style={{width: 25, height: 25}}/>
+                        </div>
                   </button>
                 : null}
 

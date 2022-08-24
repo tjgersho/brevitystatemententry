@@ -24,6 +24,8 @@ export interface BSEProps {
     placeholder?:string,
     onChange?: ChangeEventHandler<HTMLTextAreaElement>,
     onBlur?: React.FocusEventHandler<HTMLTextAreaElement>,
+    setTextAreaInput?: any,
+    reference?: any,
     onSave?: onSaveType,
     audience?: AudienceType,
     apiBase?: string,
