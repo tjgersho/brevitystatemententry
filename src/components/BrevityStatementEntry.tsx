@@ -414,26 +414,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                   </button>
                 : null}
        
-                {this.props.showSave? 
-                  <button 
-                    style={{...this.btnStyleDefault, ...this.props.btnStyles, marginTop:5, marginBottom: 5}}
-                    onClick={
-                      ()=>{
-                        if(this.props.onSave){
-                          this.props.onSave(this.state.statementEntry); 
-                        }
-                        console.log("SAVE>>");
-                        this.setState({editMode: false})
-                      }} 
-                      disabled={this.props.disabled}
-                      >
-                        <div style={{width: 50, height:50, display: 'flex', alignItems: 'center',justifyContent: 'center'}}> 
-                          <FaSave style={{width: 25, height: 25}}/>
-                        </div>
-                  </button>
-                : null}
-
-                 {(this.state.history.length > 0 || this.state.loading) && !this.props.doSuggestionList ?
+              {(this.state.history.length > 0 || this.state.loading) && !this.props.doSuggestionList ?
                   <button 
                       style={{...this.btnStyleDefault, ...this.props.btnStyles}}
                       onClick={()=>{this.scrollThruStatements()}} 
@@ -453,6 +434,27 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
                         }
                   </button>
                 :null}
+
+                {this.props.showSave? 
+                  <button 
+                    style={{...this.btnStyleDefault, ...this.props.btnStyles, marginTop:5, marginBottom: 5}}
+                    onClick={
+                      ()=>{
+                        if(this.props.onSave){
+                          this.props.onSave(this.state.statementEntry); 
+                        }
+                        console.log("SAVE>>");
+                        this.setState({editMode: false})
+                      }} 
+                      disabled={this.props.disabled}
+                      >
+                        <div style={{width: 50, height:50, display: 'flex', alignItems: 'center',justifyContent: 'center'}}> 
+                          <FaSave style={{width: 25, height: 25}}/>
+                        </div>
+                  </button>
+                : null}
+
+                
 
               </div>
 
