@@ -1,0 +1,64 @@
+.rotateimg180 {
+  -webkit-transform:rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
+}
+
+.tooltipright{
+  position: relative;
+  display: inline-block;
+  border-bottom: 2px dotted blue;
+}
+
+.tooltipright .toolttext {
+  visibility: hidden;
+  width: 200px;
+  height:100px;
+  background-color:lightsalmon;
+  color: black;
+  text-align: center;
+  border-radius: 4px;
+  padding: 8px ;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 0;
+  left: 110%;
+}
+
+.tooltipright .toolttext {
+  visibility: visible;
+}
+
+/*left position*/
+.tooltipleft{
+  position: relative;
+  display: inline-block;
+}
+
+.tooltipleft .toolttextleft {
+  visibility: hidden;
+  width: 200px;
+  height:50px;
+  background-color: #144295;
+  color: white;
+  display:  flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  border-radius: 4px;
+  padding: 5px ;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+  right: 130%;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+}
+
+.tooltipleft:hover .toolttextleft {
+  visibility: visible;
+  transition-duration:1.5s;
+  transition-delay:0.6s;
+  transition-timing-function: linear;
+}
