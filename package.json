@@ -1,6 +1,6 @@
 {
   "name": "brevitystatemententry",
-  "version": "1.3.1",
+  "version": "1.4.7",
   "description": "Special text entry component which gets AI text suggestions.",
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",

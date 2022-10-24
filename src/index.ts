@@ -1,4 +1,4 @@
 import BrevityStatementEntry from "./components/BrevityStatementEntry";
-import { AudienceType, BSEProps} from "./components/BrevityStatementEntry.types";
+import { AudienceType, BSEProps, WordingOptimization} from "./components/BrevityStatementEntry.types";
 
-export { BrevityStatementEntry, BSEProps, AudienceType };
+export { BrevityStatementEntry, BSEProps, AudienceType, WordingOptimization };

@@ -1,21 +1,17 @@
 
  
-export async function getCompletions(apiBase: string, prompt: string): Promise<any>{
+export async function getCompletions(apiBase: string, prompt: string, audience: number = 0, optimizeBy: number = 0): Promise<any>{
     try{
-       
-
        var resp =  await fetch(apiBase + "/openai/completion", {
             headers: {
               "Content-Type": "application/json"
             },
-            body: JSON.stringify({prompt: prompt}),
+            body: JSON.stringify({prompt, optimizeBy, audience}),
             method: "POST"
           });
-
-          console.log('OpenAI Call...');
+ 
           var jsonResp = resp.json();
-          console.log(jsonResp);
-          
+ 
         return  jsonResp;
     }catch(ex){
         return "FAILED CALL";
@@ -32,11 +28,9 @@ export async function getGrammer(apiBase: string, statement: string): Promise<an
           body: JSON.stringify({statement: statement}),
           method: "POST"
         });
-
-        console.log('OpenAI Call...');
+ 
         var jsonResp = resp.json();
-        console.log(jsonResp);
-        
+  
       return  jsonResp;
   }catch(ex){
       return "FAILED CALL";

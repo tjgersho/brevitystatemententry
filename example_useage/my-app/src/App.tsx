@@ -1,17 +1,19 @@
 import React from 'react';
-import {BrevityStatementEntry, AudienceType, BSEProps} from 'brevitystatemententry';
+import {BrevityStatementEntry, AudienceType, BSEProps, WordingOptimization} from 'brevitystatemententry';
 
 
 function App() {
   var props : BSEProps = {
     id: "someId",
-    apiBase: "https://intel.brevitypitch.com",
+    apiBase: "http://localhost:8080", // 'https://intel.brevitypitch.com', // "http://localhost:8080",  //https://intel.brevitypitch.com
     audience: AudienceType.Bold,
     textAreaStyles: {background: "#eeefff"},
     label: "",
     active: true,
     showSave: true,
     disabled: false,
+    editMode: true,
+    optimizeBy: WordingOptimization.Succinctness,
     onChange: (e)=>{console.log("Change:", e.target.value)},
     onBlur: (e)=>{console.log("Blur:", e.target.value)},
     textViewStyles: {fontSize: 20}
