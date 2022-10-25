@@ -89,7 +89,12 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
         }
         
         if(this.props.value !== null && this.props.value !== undefined){
-            this.setState({statementEntry: this.props.value});
+            this.setState({statementEntry: this.props.value}, ()=>{
+              const regExp = /[a-zA-Z0-9]/g;
+              if(this.state.statementEntry.match(regExp)){
+                this.setState({dirtied: true});
+              }
+            });
         }
 
         if(this.props.editMode){
@@ -121,9 +126,13 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
     if(nextProps.value !== this.props.value){
         if(nextProps.value !== null && nextProps.value !== undefined){
             this.setState({statementEntry: nextProps.value});
-        }
-        if(nextProps.value === ""){
-          this.setState({dirtied: false});
+        } 
+        
+        const regExp = /[a-zA-Z0-9]/g;
+        if(!this.state.statementEntry.match(regExp)){
+          if(nextProps.value === ""){
+            this.setState({dirtied: false});
+          }
         }
     }
 
@@ -432,7 +441,7 @@ class BrevityStatementEntry extends React.PureComponent<BSEProps, BSEState> {
               </div>
               <div style={{display: 'flex', flexDirection: 'column', alignItems:'center', margin: 5, justifyContent: 'space-around'}}> 
              
-                {this.props.active ?
+                {this.props.active && this.props.optimizeBy != 3 ?
                 <div className="tooltipleft"> 
                  {this.canGetSuggestion() ?
                   <span className="toolttextleft" style={{fontSize: 15}}>
